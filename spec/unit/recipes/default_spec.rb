@@ -1,14 +1,36 @@
-require 'spec_helper'
-
 describe 'mount::default' do
-  context 'When all attributes are default, on an unspecified platform' do
-    let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new
-      runner.converge(described_recipe)
-    end
+  let(:chef_run) do
+    ChefSpec::SoloRunner.new do |node|
+      node.set['mount']['devices'] = [
+        {
+          :name => 'name1',
+          :path => 'path1',
+          :format => 'format1'
+        },
+        {
+          :name => 'name2',
+          :path => 'path2',
+          :format => 'format2'
+        }
+      ]
+    end.converge(described_recipe)
+  end
 
-    it 'converges successfully' do
-      chef_run # This should not raise an error
+  it 'creates directories' do
+    chef_run.node['mount']['devices'].each do |device|
+      expect(chef_run).to create_directory(device[:path])
     end
+  end
+
+  it 'mounts devices' do
+    chef_run.node['mount']['devices'].each do |device|
+      expect(chef_run).to mount_mount(device[:path])
+        .with(device: device[:name])
+        .with(fstype: device[:format])
+
+      expect(chef_run).to enable_mount(device[:path])
+        .with(device: device[:name])
+        .with(fstype: device[:format])
+    end   
   end
 end
