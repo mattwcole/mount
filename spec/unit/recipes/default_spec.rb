@@ -31,6 +31,6 @@ describe 'mount::default' do
       expect(chef_run).to enable_mount(device[:path])
         .with(device: device[:name])
         .with(fstype: device[:format])
-    end   
+    end
   end
 end
