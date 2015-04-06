@@ -1,7 +1,7 @@
 default['mount']['devices'] = [
   {
     :name => '/dev/xvdf',
-    :path => '/state',
+    :path => '/data',
     :format => 'ext4'
   }
 ]
